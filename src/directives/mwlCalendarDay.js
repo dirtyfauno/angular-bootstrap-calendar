@@ -18,7 +18,18 @@ angular
         dayViewEnd: '@calendarDayViewEnd',
         dayViewSplit: '@calendarDayViewSplit'
       },
-      controller: function($scope, moment, calendarHelper) {
+      controller: function($log, $rootScope, $scope, moment, calendarHelper) {
+
+        $scope.hourWasClicked = function (params) {
+          $rootScope.$broadcast('hourWasClicked', params);
+          $log.debug('hourWasClicked');
+        };
+
+        $scope.eventClicked = function(params) {
+          $rootScope.$broadcast('eventWasClicked', params);
+          $log.debug('eventWasClicked');
+        };
+
         var dayViewStart = moment($scope.dayViewStart || '00:00', 'HH:mm');
         var dayViewEnd = moment($scope.dayViewEnd || '23:00', 'HH:mm');
 

@@ -6,6 +6,7 @@
 
 ## Table of contents
 
+- [Differences in this fork] (#fork)
 - [About](#about)
 - [Installation](#installation)
 - [Documentation](#documentation)
@@ -13,6 +14,15 @@
 - [Development](#development)
 - [License](#licence)
 
+## Differences in this fork
+* day calendar trigger 2 $rootScope.$broadcast events
+  * 'hourWasClicked'
+  * 'eventWasClicked'
+  
+* modified style to just render one event per day (on day calendar)
+  * TODO: make this dynamic
+
+* TODO: test (perhaps some cukes?)
 ## About
 
 This plugin is an AngularJS port of the original jQuery bootstrap calendar that can be found here:

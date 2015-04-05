@@ -3,3 +3,6 @@ node_modules
 .sass-cache
 .idea
 docs/bower_components
+demo/
+demo.html
+dist/**/*

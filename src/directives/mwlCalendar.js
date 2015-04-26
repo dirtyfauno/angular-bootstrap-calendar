@@ -15,6 +15,7 @@ angular
         editEventHtml: '=',
         deleteEventHtml: '=',
         autoOpen: '=',
+        letChangeTheView: '=',
         onEventClick: '&',
         onEditEventClick: '&',
         onDeleteEventClick: '&',

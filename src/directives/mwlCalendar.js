@@ -25,16 +25,21 @@ angular
         dayViewEnd: '@',
         dayViewSplit: '@'
       },
-      controller: function($scope, $timeout, moment, calendarTitle, calendarDebounce) {
-
+      controller: function($scope, $timeout, moment, calendarTitle, calendarDebounce, calendarHelper) {
         var vm = this;
+
+        calendarHelper.writeLetChangeTheView($scope.letChangeTheView);
 
         vm.changeView = function(view, newDay) {
           $scope.view = view;
-          $scope.currentDay = newDay;
+          $scope.currentDay = moment(newDay).toDate();
         };
 
-        vm.drillDown = function(date) {
+        vm.changeDay = function(newDay) {
+          $scope.currentDay = moment(newDay).toDate();
+        };
+
+        vm.drillDown = function(date, changeView) {
 
           var nextView = {
             'year': 'month',

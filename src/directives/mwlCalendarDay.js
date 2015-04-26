@@ -16,12 +16,22 @@ angular
         dayViewEnd: '@',
         dayViewSplit: '@'
       },
-      controller: function($scope, $timeout, moment, calendarHelper, calendarConfig) {
+      controller: function($filter, $log, $rootScope, $scope, $timeout, moment, calendarHelper, calendarConfig) {
 
         var vm = this;
         var dayViewStart, dayViewEnd;
 
         vm.calendarConfig = calendarConfig;
+
+        vm.hourWasClicked = function (params) {
+          $rootScope.$broadcast('hourWasClicked', params);
+          $log.debug('hourWasClicked');
+        };
+
+        vm.eventClicked = function(params) {
+          $rootScope.$broadcast('eventWasClicked', params);
+          $log.debug('eventWasClicked');
+        };
 
         function updateDays() {
           dayViewStart = moment($scope.dayViewStart || '00:00', 'HH:mm');
@@ -41,7 +51,6 @@ angular
         var originalLocale = moment.locale();
 
         $scope.$on('calendar.refreshView', function() {
-
           if (originalLocale !== moment.locale()) {
             originalLocale = moment.locale();
             updateDays();

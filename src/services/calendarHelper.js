@@ -2,7 +2,13 @@
 
 angular
   .module('mwl.calendar')
-  .factory('calendarHelper', function (moment, calendarConfig) {
+  .factory('calendarHelper', function ($rootScope, moment, calendarConfig) {
+
+    var sharedVariables = {
+      daySelected: undefined,
+      currentDay: undefined,
+      letChangeTheView: true
+    };
 
     function eventIsInPeriod(eventStart, eventEnd, periodStart, periodEnd) {
 

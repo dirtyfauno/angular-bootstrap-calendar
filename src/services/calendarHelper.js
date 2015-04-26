@@ -112,7 +112,8 @@ angular
           isFuture: today.isBefore(day),
           isWeekend: [0, 6].indexOf(day.day()) > -1,
           events: monthEvents,
-          badgeTotal: getBadgeTotal(monthEvents)
+          badgeTotal: getBadgeTotal(monthEvents),
+          isSelected: dayStillSelected(day.clone()) // when user clicks the day is 'true'
         });
 
         day.add(1, 'day');

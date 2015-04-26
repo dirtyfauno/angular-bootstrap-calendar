@@ -47,8 +47,13 @@ angular
             'week': 'day'
           };
 
-          if ($scope.onDrillDownClick({calendarDate: moment(date).toDate(), calendarNextView: nextView[$scope.view]}) !== false) {
-            vm.changeView(nextView[$scope.view], date);
+          if(calendarHelper.readSharedVariables().letChangeTheView) {
+            if ($scope.onDrillDownClick({calendarDate: moment(date).toDate(),
+                calendarNextView: nextView[$scope.view]}) !== false) {
+              vm.changeView(nextView[$scope.view], date);
+            }
+          } else {
+            vm.changeDay(date);
           }
 
         };

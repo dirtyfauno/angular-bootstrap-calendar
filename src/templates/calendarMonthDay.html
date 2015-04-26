@@ -1,4 +1,4 @@
-<div
+<div ng-click="vm.calendarCtrl.drillDown(day.date)"
   class="cal-month-day"
   ng-class="{
             'cal-day-outmonth': !day.inMonth,
@@ -6,7 +6,8 @@
             'cal-day-weekend': day.isWeekend,
             'cal-day-past': day.isPast,
             'cal-day-today': day.isToday,
-            'cal-day-future': day.isFuture
+            'cal-day-future': day.isFuture,
+            'cal-day-selected': day.isSelected
           }">
 
   <small
@@ -18,7 +19,7 @@
   <span
     class="pull-right"
     data-cal-date
-    ng-click="vm.calendarCtrl.drillDown(day.date)">
+    ng-click="vm.calendarCtrl.drillDown(day.date, false)">
     {{ day.label }}
   </span>
 

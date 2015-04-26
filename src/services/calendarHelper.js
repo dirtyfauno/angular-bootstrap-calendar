@@ -39,6 +39,15 @@ angular
       }).length;
     }
 
+    function dayStillSelected(day) {
+
+      if (sharedVariables.daySelected !== undefined) {
+        return moment(day).format('MMMM Do YYYY') === moment(sharedVariables.daySelected.date).format('MMMM Do YYYY');
+      }
+
+      return false;
+    }
+
     function getWeekDayNames() {
       var weekdays = [];
       var count = 0;

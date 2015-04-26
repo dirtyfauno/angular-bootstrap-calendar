@@ -253,12 +253,37 @@ angular
 
     }
 
+    function readSharedVariables() {
+      return sharedVariables;
+    }
+
+    function readDaySelected() {
+      return sharedVariables.daySelected;
+    }
+
+    function writeDaySelected(day) {
+      sharedVariables.daySelected = day;
+      $rootScope.$broadcast('dayWasSelected');
+    }
+
+    function writeLetChangeTheView(bool) {
+
+      if(bool === undefined) {
+        bool = true;
+      }
+      sharedVariables.letChangeTheView = bool;
+    }
+
     return {
       getWeekDayNames: getWeekDayNames,
       getYearView: getYearView,
       getMonthView: getMonthView,
       getWeekView: getWeekView,
-      getDayView: getDayView
+      getDayView: getDayView,
+      readSharedVariables: readSharedVariables,
+      readDaySelected: readDaySelected,
+      writeDaySelected: writeDaySelected,
+      writeLetChangeTheView: writeLetChangeTheView
     };
 
   });

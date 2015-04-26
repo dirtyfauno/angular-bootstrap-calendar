@@ -46,6 +46,10 @@ angular
         });
 
         vm.dayClicked = function(day, dayClickedFirstRun) {
+          unselectDaySelected(vm.view);
+          day.isSelected = true;
+
+          calendarHelper.writeDaySelected(day);
 
           if (!dayClickedFirstRun) {
             $scope.onTimespanClick({calendarDate: day.date.toDate()});
@@ -78,10 +82,20 @@ angular
           });
 
         };
+
+        function unselectDaySelected(daysCollection) {
+          daysCollection.forEach(function(monthDay) {
+            monthDay.isSelected = false;
+          });
+        }
       },
       controllerAs: 'vm',
       link: function(scope, element, attrs, calendarCtrl) {
         scope.vm.calendarCtrl = calendarCtrl;
+
+        scope.vm.changeCurrentDay = function(date) {
+          scope.currentDay = date;
+        };
       }
     };
 

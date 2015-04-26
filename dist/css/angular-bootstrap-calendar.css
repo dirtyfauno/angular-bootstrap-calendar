@@ -213,6 +213,9 @@
 .cal-slide-content ul.unstyled {
   margin-bottom: 0;
 }
+.cal-day-selected {
+  background: #ffae4e;
+}
 .cal-week-box {
   position: relative;
 }
@@ -286,7 +289,8 @@
 }
 .cal-day-box .day-event {
   position: absolute;
-  width: 150px;
+  width: 90%;
+  text-align: center;
   overflow: hidden;
 }
 .cal-day-box .day-event a {

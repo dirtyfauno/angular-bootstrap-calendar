@@ -37,9 +37,15 @@
     ]);
     'use strict';
     angular.module('mwl.calendar').factory('calendarHelper', [
+        '$rootScope',
         'moment',
         'calendarConfig',
-        function (moment, calendarConfig) {
+        function ($rootScope, moment, calendarConfig) {
+            var sharedVariables = {
+                daySelected: undefined,
+                currentDay: undefined,
+                letChangeTheView: true
+            };
             function eventIsInPeriod(eventStart, eventEnd, periodStart, periodEnd) {
                 eventStart = moment(eventStart);
                 eventEnd = moment(eventEnd);
@@ -58,6 +64,12 @@
                 return events.filter(function (event) {
                     return event.incrementsBadgeTotal !== false;
                 }).length;
+            }
+            function dayStillSelected(day) {
+                if (sharedVariables.daySelected !== undefined) {
+                    return moment(day).format('MMMM Do YYYY') === moment(sharedVariables.daySelected.date).format('MMMM Do YYYY');
+                }
+                return false;
             }
             function getWeekDayNames() {
                 var weekdays = [];
@@ -117,7 +129,8 @@
                             6
                         ].indexOf(day.day()) > -1,
                         events: monthEvents,
-                        badgeTotal: getBadgeTotal(monthEvents)
+                        badgeTotal: getBadgeTotal(monthEvents),
+                        isSelected: dayStillSelected(day.clone())    // when user clicks the day is 'true'
                     });
                     day.add(1, 'day');
                 }
@@ -226,12 +239,32 @@
                     return event;
                 });
             }
+            function readSharedVariables() {
+                return sharedVariables;
+            }
+            function readDaySelected() {
+                return sharedVariables.daySelected;
+            }
+            function writeDaySelected(day) {
+                sharedVariables.daySelected = day;
+                $rootScope.$broadcast('dayWasSelected');
+            }
+            function writeLetChangeTheView(bool) {
+                if (bool === undefined) {
+                    bool = true;
+                }
+                sharedVariables.letChangeTheView = bool;
+            }
             return {
                 getWeekDayNames: getWeekDayNames,
                 getYearView: getYearView,
                 getMonthView: getMonthView,
                 getWeekView: getWeekView,
-                getDayView: getDayView
+                getDayView: getDayView,
+                readSharedVariables: readSharedVariables,
+                readDaySelected: readDaySelected,
+                writeDaySelected: writeDaySelected,
+                writeLetChangeTheView: writeLetChangeTheView
             };
         }
     ]);
@@ -574,6 +607,9 @@
                         }
                     });
                     vm.dayClicked = function (day, dayClickedFirstRun) {
+                        unselectDaySelected(vm.view);
+                        day.isSelected = true;
+                        calendarHelper.writeDaySelected(day);
                         if (!dayClickedFirstRun) {
                             $scope.onTimespanClick({ calendarDate: day.date.toDate() });
                         }
@@ -599,11 +635,19 @@
                             }
                         });
                     };
+                    function unselectDaySelected(daysCollection) {
+                        daysCollection.forEach(function (monthDay) {
+                            monthDay.isSelected = false;
+                        });
+                    }
                 }
             ],
             controllerAs: 'vm',
             link: function (scope, element, attrs, calendarCtrl) {
                 scope.vm.calendarCtrl = calendarCtrl;
+                scope.vm.changeCurrentDay = function (date) {
+                    scope.currentDay = date;
+                };
             }
         };
     });
@@ -622,15 +666,26 @@
                 dayViewSplit: '@'
             },
             controller: [
+                '$filter',
+                '$log',
+                '$rootScope',
                 '$scope',
                 '$timeout',
                 'moment',
                 'calendarHelper',
                 'calendarConfig',
-                function ($scope, $timeout, moment, calendarHelper, calendarConfig) {
+                function ($filter, $log, $rootScope, $scope, $timeout, moment, calendarHelper, calendarConfig) {
                     var vm = this;
                     var dayViewStart, dayViewEnd;
                     vm.calendarConfig = calendarConfig;
+                    vm.hourWasClicked = function (params) {
+                        $rootScope.$broadcast('hourWasClicked', params);
+                        $log.debug('hourWasClicked');
+                    };
+                    vm.eventClicked = function (params) {
+                        $rootScope.$broadcast('eventWasClicked', params);
+                        $log.debug('eventWasClicked');
+                    };
                     function updateDays() {
                         dayViewStart = moment($scope.dayViewStart || '00:00', 'HH:mm');
                         dayViewEnd = moment($scope.dayViewEnd || '23:00', 'HH:mm');
@@ -670,6 +725,7 @@
                 editEventHtml: '=',
                 deleteEventHtml: '=',
                 autoOpen: '=',
+                letChangeTheView: '=',
                 onEventClick: '&',
                 onEditEventClick: '&',
                 onDeleteEventClick: '&',
@@ -685,23 +741,32 @@
                 'moment',
                 'calendarTitle',
                 'calendarDebounce',
-                function ($scope, $timeout, moment, calendarTitle, calendarDebounce) {
+                'calendarHelper',
+                function ($scope, $timeout, moment, calendarTitle, calendarDebounce, calendarHelper) {
                     var vm = this;
+                    calendarHelper.writeLetChangeTheView($scope.letChangeTheView);
                     vm.changeView = function (view, newDay) {
                         $scope.view = view;
-                        $scope.currentDay = newDay;
+                        $scope.currentDay = moment(newDay).toDate();
                     };
-                    vm.drillDown = function (date) {
+                    vm.changeDay = function (newDay) {
+                        $scope.currentDay = moment(newDay).toDate();
+                    };
+                    vm.drillDown = function (date, changeView) {
                         var nextView = {
                             'year': 'month',
                             'month': 'day',
                             'week': 'day'
                         };
-                        if ($scope.onDrillDownClick({
-                                calendarDate: moment(date).toDate(),
-                                calendarNextView: nextView[$scope.view]
-                            }) !== false) {
-                            vm.changeView(nextView[$scope.view], date);
+                        if (calendarHelper.readSharedVariables().letChangeTheView) {
+                            if ($scope.onDrillDownClick({
+                                    calendarDate: moment(date).toDate(),
+                                    calendarNextView: nextView[$scope.view]
+                                }) !== false) {
+                                vm.changeView(nextView[$scope.view], date);
+                            }
+                        } else {
+                            vm.changeDay(date);
                         }
                     };
                     //Use a debounce to prevent it being called 3 times on initialisation

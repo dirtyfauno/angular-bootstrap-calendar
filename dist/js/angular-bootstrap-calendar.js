@@ -116,6 +116,11 @@
                         monthEvents = eventsInPeriod.filter(function (event) {
                             return eventIsInPeriod(event.startsAt, event.endsAt, day, day.clone().endOf('day'));
                         });
+                        if (calendarConfig.month.eventFilterBy !== undefined) {
+                            monthEvents = monthEvents.filter(function (event) {
+                                return event.type === calendarConfig.month.eventFilterBy;
+                            });
+                        }
                     }
                     view.push({
                         label: day.date(),
@@ -295,6 +300,7 @@
     ]);
     'use strict';
     angular.module('mwl.calendar').provider('calendarConfig', function () {
+        var monthConfigs = { eventFilterBy: undefined };
         var defaultDateFormats = {
             hour: 'ha',
             day: 'D MMM',
@@ -324,11 +330,16 @@
             angular.extend(i18nStrings, strings);
             return configProvider;
         };
+        configProvider.setMonthConfigs = function (configs) {
+            angular.extend(monthConfigs, configs);
+            return configProvider;
+        };
         configProvider.$get = function () {
             return {
                 dateFormats: defaultDateFormats,
                 titleFormats: defaultTitleFormats,
-                i18nStrings: i18nStrings
+                i18nStrings: i18nStrings,
+                month: monthConfigs
             };
         };
     });

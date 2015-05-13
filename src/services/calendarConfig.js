@@ -4,6 +4,10 @@ angular
   .module('mwl.calendar')
   .provider('calendarConfig', function() {
 
+    var monthConfigs = {
+      eventFilterBy : undefined
+    };
+
     var defaultDateFormats = {
       hour: 'ha',
       day: 'D MMM',
@@ -40,11 +44,17 @@ angular
       return configProvider;
     };
 
+    configProvider.setMonthConfigs = function(configs) {
+      angular.extend(monthConfigs, configs);
+      return configProvider;
+    };
+
     configProvider.$get = function() {
       return {
         dateFormats: defaultDateFormats,
         titleFormats: defaultTitleFormats,
-        i18nStrings: i18nStrings
+        i18nStrings: i18nStrings,
+        month: monthConfigs
       };
     };
 

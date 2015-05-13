@@ -101,6 +101,13 @@ angular
           monthEvents = eventsInPeriod.filter(function(event) {
             return eventIsInPeriod(event.startsAt, event.endsAt, day, day.clone().endOf('day'));
           });
+
+          if(calendarConfig.month.eventFilterBy !== undefined) {
+            monthEvents = monthEvents.filter(function(event) {
+              return event.type === calendarConfig.month.eventFilterBy;
+            });
+          }
+
         }
 
         view.push({

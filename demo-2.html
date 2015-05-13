@@ -71,6 +71,7 @@
     <!--<pre style="height: 280px; overflow: auto">{{ jamon.calendar_config | json }}</pre>-->
   </div>
 </div>
+<script src="/docs/bower_components/Faker/build/build/faker.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
 <!--https://github.com/a8m/angular-filter#get-started-->
@@ -78,113 +79,46 @@
 <script src="/dist/js/angular-bootstrap-calendar-tpls.min.js"></script>
 <script>
   angular.module('app.jamon2', ['mwl.calendar', 'angular.filter'])
-    .factory('CalendarConfig', function ($filter, $window, $log, CalendarListener) {
+    .config(function(calendarConfigProvider) {
+      calendarConfigProvider.setMonthConfigs({
+        eventFilterBy: 'warning'
+      });
+    })
+    .factory('CalendarConfig', function ($filter, CalendarListener,
+                                         $window,
+                                         $log) {
 
       var testAction = testAction;
 
-//      {
-//        title: 'My event title', // The title of the event
-//          type: 'info', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-//        startsAt: new Date(2013,5,1,1), // A javascript date object for when the event starts
-//        endsAt: new Date(2014,8,26,15), // A javascript date object for when the event ends
-//        editable: false, // If edit-event-html is set and this field is explicitly set to false then dont make it editable
-//        deletable: false, // If delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-//        incrementsBadgeTotal: true //If set to false then will not count towards the badge total amount on the month and year view
-//      }
-      var events = [
-        {
-          requester: 'Karla',
-          title: 'My event title', // The title of the event
-          type: 'success', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-          startsAt: new Date(2015, 3, 3, 1), // A javascript date object for when the event starts
-          endsAt: new Date(2015, 3, 3, 3), // A javascript date object for when the event ends
-          editable: true, // If calendar-edit-event-html is set and this field is explicitly set to false then dont make it editable
-          deletable: true, // If calendar-delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-          request: 3,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'Denisse',
-          title: 'My event title', // The title of the event
-          type: 'success', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-          startsAt: new Date(2015, 3, 5, 5), // A javascript date object for when the event starts
-          endsAt: new Date(2015, 3, 5, 6), // A javascript date object for when the event ends
-          editable: true, // If calendar-edit-event-html is set and this field is explicitly set to false then dont make it editable
-          deletable: true, // If calendar-delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-          request: 4,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'Jimena',
-          title: 'My event title', // The title of the event
-          type: 'success', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-          startsAt: new Date(2015, 3, 6, 5), // A javascript date object for when the event starts
-          endsAt: new Date(2015, 3, 6, 6), // A javascript date object for when the event ends
-          editable: true, // If calendar-edit-event-html is set and this field is explicitly set to false then dont make it editable
-          deletable: true, // If calendar-delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-          request: 5,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'Lulú',
-          title: 'My event title',
-          type: 'success',
-          startsAt: new Date(2015, 3, 6, 8),
-          endsAt: new Date(2015, 3, 6, 9),
-          editable: true,
-          deletable: true,
-          request: 6,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'tao',
-          title: 'My event title',
-          type: 'important',
-          startsAt: new Date(2015, 3, 7, 5),
-          endsAt: new Date(2015, 3, 7, 6),
-          editable: true,
-          deletable: true,
-          request: 1,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'tao',
-          title: 'My event title',
-          type: 'important',
-          startsAt: new Date(2015, 3, 8, 8),
-          endsAt: new Date(2015, 3, 8, 9),
-          editable: true,
-          deletable: true,
-          request: 1,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'sarah',
-          title: 'My cuddle event', // The title of the event
-          type: 'important', // The type of the event (determines its color). Can be important, warning, info, inverse, success or special
-          startsAt: new Date(2015, 3, 9, 5), // A javascript date object for when the event starts
-          endsAt: new Date(2015, 3, 9, 6), // A javascript date object for when the event ends
-          editable: true, // If calendar-edit-event-html is set and this field is explicitly set to false then dont make it editable
-          deletable: true, // If calendar-delete-event-html is set and this field is explicitly set to false then dont make it deleteable
-          request: 2,
-          unique: new Date().getTime()
-        },
-        {
-          requester: 'sarah',
-          title: 'My cuddle event',
-          type: 'important',
-          startsAt: new Date(2015, 3, 9, 8),
-          endsAt: new Date(2015, 3, 9, 9),
-          editable: true,
-          deletable: true,
-          request: 2,
-          unique: new Date().getTime()
-        }
+       var los_eventos = new Array(15).join().split(',')
+                                      .map(function (item, index) {
+                                          return ++index;
+                                      });
 
-      ];
+        los_eventos = los_eventos.map(function (element, index) {
 
+         var from = $window.moment();
+         var to = $window.moment().add(7, 'days');
+         var date = $window.faker.date.between(from, to);
+         var random_title = $window.faker.internet.email();
+
+         var start = $window.moment(date).startOf('hour').format('YYYY-MM-DD HH:mm');
+         var end = $window.moment(start).add(30, 'minutes').format('YYYY-MM-DD HH:mm');
+         var types = ['success', 'important', 'warning', 'jamon'];
+         var type = types[Math.floor(Math.random() * types.length)];
+
+         return {
+           unique: new Date().getTime(),
+           title: random_title,
+           type: type,
+           startsAt: start,
+           endsAt: end,
+           incrementsBadgeTotal: false // to not show a number in the badge with the current events during day
+         };
+        });
+      
       var calendar = {
-        events: events,
+        events: los_eventos,
         calendarView: 'month',
         currentDay: new Date(),
         control: undefined,
@@ -249,7 +183,8 @@
        * @param events_array
        */
       function add_event_to_events(data, events_array) {
-
+        console.log('add_event_to_events');
+        console.log(data);
         var init_event = $window
           .moment(data.day)
           .hour(data.hour)
@@ -268,6 +203,7 @@
         var event_schedule_exist = boolean_array.indexOf(true) !== -1;
 
         if (event_schedule_exist) {
+          console.log('event_schedule_exist')
           return false;
         }
 
